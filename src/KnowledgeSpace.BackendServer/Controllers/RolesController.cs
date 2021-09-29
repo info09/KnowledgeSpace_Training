@@ -8,9 +8,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSpace.BackendServer.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class RolesController : ControllerBase
+    public class RolesController : BaseController
     {
         private readonly RoleManager<IdentityRole> _roleManager;
 
