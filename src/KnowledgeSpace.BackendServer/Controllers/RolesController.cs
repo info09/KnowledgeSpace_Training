@@ -18,18 +18,18 @@ namespace KnowledgeSpace.BackendServer.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostRole(RoleVm roleVm)
+        public async Task<IActionResult> PostRole(RoleCreateRequest request)
         {
             var role = new IdentityRole()
             {
-                Id = roleVm.Id,
-                Name = roleVm.Name,
-                NormalizedName = roleVm.Name.ToUpper()
+                Id = request.Id,
+                Name = request.Name,
+                NormalizedName = request.Name.ToUpper()
             };
             var result = await _roleManager.CreateAsync(role);
             if (result.Succeeded)
             {
-                return CreatedAtAction(nameof(GetById), new { id = role.Id }, roleVm);
+                return CreatedAtAction(nameof(GetById), new { id = role.Id }, request);
             }
             else
             {
