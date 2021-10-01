@@ -1,11 +1,11 @@
 ﻿using Dapper;
+using KnowledgeSpace.BackendServer.Authorization;
+using KnowledgeSpace.BackendServer.Constants;
 using KnowledgeSpace.ViewModels.Systems;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,12 +20,17 @@ namespace KnowledgeSpace.BackendServer.Controllers
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Show list function with corressponding action included in each functions
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
+        [ClaimRequirement(FunctionCode.SYSTEM_PERMISSION, CommandCode.VIEW)]
         public async Task<IActionResult> GetCommandViews()
         {
-            using(SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
-                if(conn.State == System.Data.ConnectionState.Closed)
+                if (conn.State == ConnectionState.Closed)
                 {
                     await conn.OpenAsync();
                 }
@@ -43,7 +48,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
                         GROUP BY f.Id,f.Name, f.ParentId
                         order BY f.ParentId";
 
-                var result = await conn.QueryAsync<PermissionScreenVm>(sql, null, null, 120, System.Data.CommandType.Text);
+                var result = await conn.QueryAsync<PermissionScreenVm>(sql, null, null, 120, CommandType.Text);
                 return Ok(result.ToList());
             }
         }

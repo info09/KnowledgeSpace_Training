@@ -55,6 +55,7 @@ namespace KnowledgeSpace.BackendServer
             .AddInMemoryClients(Config.Clients)
             .AddInMemoryIdentityResources(Config.Ids)
             .AddAspNetIdentity<User>()
+            .AddProfileService<IdentityProfileService>()
             .AddDeveloperSigningCredential();
 
             services.Configure<IdentityOptions>(options =>
@@ -90,7 +91,7 @@ namespace KnowledgeSpace.BackendServer
                 });
             });
 
-            services.AddRazorPages(options => 
+            services.AddRazorPages(options =>
             {
                 options.Conventions.AddAreaFolderRouteModelConvention("Identity", "/Account/", model =>
                 {
@@ -119,16 +120,15 @@ namespace KnowledgeSpace.BackendServer
                         {
                             AuthorizationUrl = new Uri("https://localhost:5000/connect/authorize"),
                             Scopes = new Dictionary<string, string> { { "api.knowledgespace", "KnowledgeSpace API" } }
-                        }
-                    }
+                        },
+                    },
                 });
-
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
                         new OpenApiSecurityScheme
                         {
-                            Reference = new OpenApiReference{Type = ReferenceType.SecurityScheme, Id = "Bearer"}
+                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
                         },
                         new List<string>{ "api.knowledgespace" }
                     }
