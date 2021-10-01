@@ -1,6 +1,7 @@
 using FluentValidation.AspNetCore;
 using KnowledgeSpace.BackendServer.Data;
 using KnowledgeSpace.BackendServer.Data.Entities;
+using KnowledgeSpace.BackendServer.Helpers;
 using KnowledgeSpace.BackendServer.IdentityServer;
 using KnowledgeSpace.BackendServer.Services;
 using KnowledgeSpace.ViewModels.Systems;
@@ -103,6 +104,7 @@ namespace KnowledgeSpace.BackendServer
             });
             services.AddTransient<DbInitializer>();
             services.AddTransient<IEmailSender, EmailSenderService>();
+            services.AddTransient<ISequenceService, SequenceService>();
 
             services.AddSwaggerGen(c =>
             {
