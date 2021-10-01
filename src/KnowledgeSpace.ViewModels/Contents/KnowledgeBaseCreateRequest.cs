@@ -1,4 +1,7 @@
-﻿namespace KnowledgeSpace.ViewModels.Contents
+﻿using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
+
+namespace KnowledgeSpace.ViewModels.Contents
 {
     public class KnowledgeBaseCreateRequest
     {
@@ -23,5 +26,7 @@
         public string Note { get; set; }
 
         public string Labels { get; set; }
+
+        public List<IFormFile> Attachments { get; set; }
     }
 }

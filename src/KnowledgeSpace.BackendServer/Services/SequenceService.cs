@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Threading.Tasks;
 
-namespace KnowledgeSpace.BackendServer.Helpers
+namespace KnowledgeSpace.BackendServer.Services
 {
     public class SequenceService : ISequenceService
     {
