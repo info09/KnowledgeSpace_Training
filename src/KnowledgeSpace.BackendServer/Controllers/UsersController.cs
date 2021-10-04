@@ -2,6 +2,7 @@
 using KnowledgeSpace.BackendServer.Constants;
 using KnowledgeSpace.BackendServer.Data;
 using KnowledgeSpace.BackendServer.Data.Entities;
+using KnowledgeSpace.BackendServer.Helpers;
 using KnowledgeSpace.ViewModels;
 using KnowledgeSpace.ViewModels.Systems;
 using Microsoft.AspNetCore.Identity;
@@ -19,7 +20,9 @@ namespace KnowledgeSpace.BackendServer.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
 
-        public UsersController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context)
+        public UsersController(UserManager<User> userManager,
+            RoleManager<IdentityRole> roleManager,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -28,6 +31,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
 
         [HttpPost]
         [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.CREATE)]
+        [ApiValidationFilter]
         public async Task<IActionResult> PostUser(UserCreateRequest request)
         {
             var user = new User()
@@ -47,29 +51,28 @@ namespace KnowledgeSpace.BackendServer.Controllers
             }
             else
             {
-                return BadRequest(result.Errors);
+                return BadRequest(new ApiBadRequestResponse(result));
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet]
         [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetUsers()
         {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-                return NotFound();
+            var users = _userManager.Users;
 
-            var userVm = new UserVm()
+            var uservms = await users.Select(u => new UserVm()
             {
-                Id = user.Id,
-                UserName = user.UserName,
-                Dob = user.Dob,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                FirstName = user.FirstName,
-                LastName = user.LastName
-            };
-            return Ok(userVm);
+                Id = u.Id,
+                UserName = u.UserName,
+                Dob = u.Dob,
+                Email = u.Email,
+                PhoneNumber = u.PhoneNumber,
+                FirstName = u.FirstName,
+                LastName = u.LastName
+            }).ToListAsync();
+
+            return Ok(uservms);
         }
 
         [HttpGet("filter")]
@@ -106,24 +109,26 @@ namespace KnowledgeSpace.BackendServer.Controllers
             return Ok(pagination);
         }
 
-        [HttpGet]
+        //URL: GET: http://localhost:5001/api/users/{id}
+        [HttpGet("{id}")]
         [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetById(string id)
         {
-            var users = _userManager.Users;
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound(new ApiNotFoundResponse($"Cannot found user with id: {id}"));
 
-            var uservms = await users.Select(u => new UserVm()
+            var userVm = new UserVm()
             {
-                Id = u.Id,
-                UserName = u.UserName,
-                Dob = u.Dob,
-                Email = u.Email,
-                PhoneNumber = u.PhoneNumber,
-                FirstName = u.FirstName,
-                LastName = u.LastName
-            }).ToListAsync();
-
-            return Ok(uservms);
+                Id = user.Id,
+                UserName = user.UserName,
+                Dob = user.Dob,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            };
+            return Ok(userVm);
         }
 
         [HttpPut("{id}")]
@@ -132,7 +137,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
-                return NotFound();
+                return NotFound(new ApiNotFoundResponse($"Cannot found user with id: {id}"));
 
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
@@ -144,7 +149,25 @@ namespace KnowledgeSpace.BackendServer.Controllers
             {
                 return NoContent();
             }
-            return BadRequest(result.Errors);
+            return BadRequest(new ApiBadRequestResponse(result));
+        }
+
+        [HttpPut("{id}/change-password")]
+        [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.UPDATE)]
+        [ApiValidationFilter]
+        public async Task<IActionResult> PutUserPassword(string id, [FromBody] UserPasswordChangeRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound(new ApiNotFoundResponse($"Cannot found user with id: {id}"));
+
+            var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+
+            if (result.Succeeded)
+            {
+                return NoContent();
+            }
+            return BadRequest(new ApiBadRequestResponse(result));
         }
 
         [HttpDelete("{id}")]
@@ -171,48 +194,33 @@ namespace KnowledgeSpace.BackendServer.Controllers
                 };
                 return Ok(uservm);
             }
-            return BadRequest(result.Errors);
-        }
-
-        [HttpPut("{id}/change-password")]
-        [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.UPDATE)]
-        public async Task<IActionResult> PutUserPassword(string id, [FromBody] UserPasswordChangeRequest request)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-                return NotFound();
-
-            var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
-
-            if (result.Succeeded)
-            {
-                return NoContent();
-            }
-            return BadRequest(result.Errors);
+            return BadRequest(new ApiBadRequestResponse(result));
         }
 
         [HttpGet("{userId}/menu")]
-        public async Task<IActionResult> GetMenuByuUserPermission(string userId)
+        public async Task<IActionResult> GetMenuByUserPermission(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
             var roles = await _userManager.GetRolesAsync(user);
-
             var query = from f in _context.Functions
-                        join p in _context.Permissions on f.Id equals p.FunctionId
+                        join p in _context.Permissions
+                            on f.Id equals p.FunctionId
                         join r in _roleManager.Roles on p.RoleId equals r.Id
-                        join c in _context.Commands on p.CommandId equals c.Id
-                        where roles.Contains(r.Name) && c.Id == "VIEW"
+                        join a in _context.Commands
+                            on p.CommandId equals a.Id
+                        where roles.Contains(r.Name) && a.Id == "VIEW"
                         select new FunctionVm
                         {
                             Id = f.Id,
                             Name = f.Name,
                             Url = f.Url,
                             ParentId = f.ParentId,
-                            SortOrder = f.SortOrder
+                            SortOrder = f.SortOrder,
                         };
-
-            var data = await query.Distinct().OrderBy(i => i.ParentId).ThenBy(i => i.SortOrder).ToListAsync();
-
+            var data = await query.Distinct()
+                .OrderBy(x => x.ParentId)
+                .ThenBy(x => x.SortOrder)
+                .ToListAsync();
             return Ok(data);
         }
     }

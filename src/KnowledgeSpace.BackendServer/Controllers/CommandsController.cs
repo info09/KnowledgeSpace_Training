@@ -13,12 +13,13 @@ namespace KnowledgeSpace.BackendServer.Controllers
 
         public CommandsController(ApplicationDbContext context)
         {
-            this._context = context;
+            _context = context;
         }
 
-        [HttpGet()]
+        [HttpGet]
         public async Task<IActionResult> GetCommants()
         {
+            var user = User.Identity.Name;
             var commands = _context.Commands;
 
             var commandVms = await commands.Select(u => new CommandVm()
