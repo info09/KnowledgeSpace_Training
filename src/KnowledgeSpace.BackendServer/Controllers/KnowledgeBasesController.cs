@@ -9,6 +9,7 @@ using KnowledgeSpace.ViewModels.Contents;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Linq;
@@ -22,14 +23,17 @@ namespace KnowledgeSpace.BackendServer.Controllers
         private readonly ApplicationDbContext _context;
         private readonly ISequenceService _sequenceService;
         private readonly IStorageService _storageService;
+        private readonly ILogger<KnowledgeBasesController> _logger;
 
         public KnowledgeBasesController(ApplicationDbContext context,
             ISequenceService sequenceService,
-            IStorageService storageService)
+            IStorageService storageService,
+            ILogger<KnowledgeBasesController> logger)
         {
             _context = context;
             _sequenceService = sequenceService;
             _storageService = storageService;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -76,6 +80,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
         [ClaimRequirement(FunctionCode.CONTENT_KNOWLEDGEBASE, CommandCode.VIEW)]
         public async Task<IActionResult> GetKnowledgeBases()
         {
+            _logger.LogInformation("Begin GetKnowledgeBase API");
             var knowledgeBases = _context.KnowledgeBases;
 
             var knowledgeBasevms = await knowledgeBases.Select(u => new KnowledgeBaseQuickVm()
@@ -87,6 +92,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
                 Title = u.Title
             }).ToListAsync();
 
+            _logger.LogInformation("End GetKnowledgeBase API");
             return Ok(knowledgeBasevms);
         }
 
