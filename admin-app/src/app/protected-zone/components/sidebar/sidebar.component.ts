@@ -2,7 +2,7 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Function } from '../../../shared/models/index';
-import { AuthService, UserService } from '../../../shared/services/index';
+import { AuthService, UsersService } from '../../../shared/services/index';
 
 @Component({
   selector: 'app-sidebar',
@@ -22,7 +22,7 @@ export class SidebarComponent implements OnInit {
   constructor(
     private translate: TranslateService,
     public router: Router,
-    private userService: UserService,
+    private userService: UsersService,
     private authService: AuthService
   ) {
     this.loadMenu();

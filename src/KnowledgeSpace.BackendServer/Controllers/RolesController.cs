@@ -26,7 +26,6 @@ namespace KnowledgeSpace.BackendServer.Controllers
             _context = context;
         }
 
-        //URL: POST: http://localhost:5001/api/roles
         [HttpPost]
         [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.CREATE)]
         [ApiValidationFilter]
