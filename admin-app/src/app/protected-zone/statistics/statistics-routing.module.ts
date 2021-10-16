@@ -14,12 +14,12 @@ const routes: Routes = [
     component: MonthlyNewKbsComponent
   },
   {
-    path: 'monthly-new-comments',
-    component: MonthlyNewCommentsComponent
+    path: 'monthly-new-members',
+    component: MonthlyNewMembersComponent
   },
   {
-    path: 'month-new-members',
-    component: MonthlyNewMembersComponent
+    path: 'monthly-new-comments',
+    component: MonthlyNewCommentsComponent
   }
 ];
 
