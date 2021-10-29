@@ -8,7 +8,6 @@ using KnowledgeSpace.ViewModels.Systems;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -42,29 +41,24 @@ namespace KnowledgeSpace.BackendServer.Controllers
             {
                 return CreatedAtAction(nameof(GetById), new { id = role.Id }, request);
             }
-            else
-            {
-                return BadRequest(new ApiBadRequestResponse(result));
-            }
+            return BadRequest(new ApiBadRequestResponse(result));
         }
-
-        //URL: GET: http://localhost:5001/api/roles/
+        
         [HttpGet]
         [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.VIEW)]
         public async Task<IActionResult> GetRoles()
         {
             var roles = _roleManager.Roles;
 
-            var rolevms = await roles.Select(r => new RoleVm()
+            var roleVms = await roles.Select(r => new RoleVm()
             {
                 Id = r.Id,
                 Name = r.Name
             }).ToListAsync();
 
-            return Ok(rolevms);
+            return Ok(roleVms);
         }
-
-        //URL: GET: http://localhost:5001/api/roles/?filter={filter}&pageIndex=1&pageSize=10
+        
         [HttpGet("filter")]
         [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.VIEW)]
         public async Task<IActionResult> GetRolesPaging(string filter, int pageIndex, int pageSize)
@@ -91,8 +85,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
             };
             return Ok(pagination);
         }
-
-        //URL: GET: http://localhost:5001/api/roles/{id}
+        
         [HttpGet("{id}")]
         [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.VIEW)]
         public async Task<IActionResult> GetById(string id)
@@ -108,8 +101,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
             };
             return Ok(roleVm);
         }
-
-        //URL: PUT: http://localhost:5001/api/roles/{id}
+        
         [HttpPut("{id}")]
         [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.UPDATE)]
         [ApiValidationFilter]
@@ -133,8 +125,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
             }
             return BadRequest(new ApiBadRequestResponse(result));
         }
-
-        //URL: DELETE: http://localhost:5001/api/roles/{id}
+        
         [HttpDelete("{id}")]
         [ClaimRequirement(FunctionCode.SYSTEM_ROLE, CommandCode.DELETE)]
         public async Task<IActionResult> DeleteRole(string id)
@@ -145,16 +136,13 @@ namespace KnowledgeSpace.BackendServer.Controllers
 
             var result = await _roleManager.DeleteAsync(role);
 
-            if (result.Succeeded)
+            if (!result.Succeeded) return BadRequest(new ApiBadRequestResponse(result));
+            var roleVm = new RoleVm()
             {
-                var rolevm = new RoleVm()
-                {
-                    Id = role.Id,
-                    Name = role.Name
-                };
-                return Ok(rolevm);
-            }
-            return BadRequest(new ApiBadRequestResponse(result));
+                Id = role.Id,
+                Name = role.Name
+            };
+            return Ok(roleVm);
         }
 
         [HttpGet("{roleId}/permissions")]
@@ -182,11 +170,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
         public async Task<IActionResult> PutPermissionByRoleId(string roleId, [FromBody] UpdatePermissionRequest request)
         {
             //create new permission list from user changed
-            var newPermissions = new List<Permission>();
-            foreach (var p in request.Permissions)
-            {
-                newPermissions.Add(new Permission(p.FunctionId, roleId, p.CommandId));
-            }
+            var newPermissions = request.Permissions.Select(p => new Permission(p.FunctionId, roleId, p.CommandId)).ToList();
 
             var existingPermissions = _context.Permissions.Where(x => x.RoleId == roleId);
             _context.Permissions.RemoveRange(existingPermissions);

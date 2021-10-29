@@ -17,7 +17,10 @@
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
-            "assets": ["src/assets", "src/favicon.ico"],
+            "assets": [
+              "src/assets",
+              "src/favicon.ico"
+            ],
             "styles": [
               "node_modules/font-awesome/css/font-awesome.css",
               "node_modules/primeicons/primeicons.css",
@@ -27,7 +30,10 @@
               "node_modules/alertifyjs/build/css/themes/default.css",
               "src/styles/app.scss"
             ],
-            "scripts": ["node_modules/chart.js/dist/Chart.js", "node_modules/alertifyjs/build/alertify.js"]
+            "scripts": [
+              "node_modules/chart.js/dist/Chart.js",
+              "node_modules/alertifyjs/build/alertify.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -80,16 +86,29 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
-            "scripts": ["node_modules/chart.js/dist/Chart.js"],
-            "styles": ["node_modules/font-awesome/css/font-awesome.css", "src/styles/app.scss"],
-            "assets": ["src/assets", "src/favicon.ico"]
+            "scripts": [
+              "node_modules/chart.js/dist/Chart.js"
+            ],
+            "styles": [
+              "node_modules/font-awesome/css/font-awesome.css",
+              "src/styles/app.scss"
+            ],
+            "assets": [
+              "src/assets",
+              "src/favicon.ico"
+            ]
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": ["src/tsconfig.app.json", "src/tsconfig.spec.json"],
-            "exclude": ["**/node_modules/**"]
+            "tsConfig": [
+              "src/tsconfig.app.json",
+              "src/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -115,7 +134,9 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": "e2e/tsconfig.e2e.json",
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }

@@ -16,19 +16,19 @@ export class RolesService extends BaseService {
   add(entity: Role) {
     return this.http
       .post(`${environment.apiUrl}/api/roles`, JSON.stringify(entity), { headers: this._sharedHeader })
-      .pipe(catchError(this.handlerError));
+      .pipe(catchError(this.handleError));
   }
 
   update(id: string, entity: Role) {
     return this.http
       .put(`${environment.apiUrl}/api/roles/${id}`, JSON.stringify(entity), { headers: this._sharedHeader })
-      .pipe(catchError(this.handlerError));
+      .pipe(catchError(this.handleError));
   }
 
   getDetail(id) {
     return this.http
       .get<Role>(`${environment.apiUrl}/api/roles/${id}`, { headers: this._sharedHeader })
-      .pipe(catchError(this.handlerError));
+      .pipe(catchError(this.handleError));
   }
 
   getAllPaging(filter, pageIndex, pageSize) {
@@ -41,13 +41,22 @@ export class RolesService extends BaseService {
         map((response: Pagination<Role>) => {
           return response;
         }),
-        catchError(this.handlerError)
+        catchError(this.handleError)
       );
   }
 
   delete(id) {
     return this.http
       .delete(environment.apiUrl + '/api/roles/' + id, { headers: this._sharedHeader })
-      .pipe(catchError(this.handlerError));
+      .pipe(catchError(this.handleError));
+  }
+
+  getAll() {
+    return this.http.get<Role[]>(`${environment.apiUrl}/api/roles`, { headers: this._sharedHeader }).pipe(
+      map((res: Role[]) => {
+        return res;
+      }),
+      catchError(this.handleError)
+    );
   }
 }

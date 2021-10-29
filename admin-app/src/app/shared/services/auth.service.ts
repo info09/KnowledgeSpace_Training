@@ -49,7 +49,7 @@ export class AuthService extends BaseService {
     return this.user != null ? this.user.profile.name : '';
   }
 
-  get profile(): Profile {
+  get profile() {
     return this.user != null ? this.user.profile : null;
   }
 
