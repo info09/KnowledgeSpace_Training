@@ -17,7 +17,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCommants()
+        public async Task<IActionResult> GetCommands()
         {
             var commands = _context.Commands;
 
