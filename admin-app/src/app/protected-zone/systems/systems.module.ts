@@ -10,18 +10,21 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { BlockUIModule } from 'primeng/blockui';
+import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { RolesDetailComponent } from './roles/roles-detail/roles-detail.component';
-import { NotificationService } from '../../shared/services/index';
+import { NotificationService } from '../../shared/services';
 import { BsModalService, ModalModule } from 'ngx-bootstrap/modal';
 import { ValidationMessageModule } from '../../shared/modules/validation-message/validation-message.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UsersDetailComponent } from './users/users-detail/users-detail.component';
+import { RolesAssignComponent } from './users/roles-assign/roles-assign.component';
 import { CalendarModule } from 'primeng/calendar';
 import { CheckboxModule } from 'primeng/checkbox';
 
 import { KeyFilterModule } from 'primeng/keyfilter';
-import { RolesAssignComponent } from './users/roles-assign/roles-assign.component';
+import { TreeTableModule } from 'primeng/treetable';
+import { DropdownModule } from 'primeng/dropdown';
 
 @NgModule({
   declarations: [
@@ -41,13 +44,16 @@ import { RolesAssignComponent } from './users/roles-assign/roles-assign.componen
     TableModule,
     PaginatorModule,
     BlockUIModule,
-    ProgressSpinnerModule,
     FormsModule,
+    InputTextModule,
     ReactiveFormsModule,
+    ProgressSpinnerModule,
     ValidationMessageModule,
+    KeyFilterModule,
     CalendarModule,
     CheckboxModule,
-    KeyFilterModule,
+    TreeTableModule,
+    DropdownModule,
     ModalModule.forRoot()
   ],
   providers: [NotificationService, BsModalService, DatePipe]
